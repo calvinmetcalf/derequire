@@ -16,13 +16,6 @@ function rename(code, tokenTo, tokenFrom){
             }
         } 
     });
-    return escodegen.generate(ast,{
-        format:{
-            escapeless:true,
-            compact:true,
-            semicolons:false,
-            parentheses:false
-        }
-    });
+    return escodegen.generate(ast);
 }
 module.exports = rename;
