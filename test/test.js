@@ -10,7 +10,7 @@ describe('derequire', function(){
     derequire(exampleText).should.equal("function x(__derequire__, module, exports) {\n    var process = __derequire__('__browserify_process');\n    var requireText = {};\n    requireText.require = 'require';\n    (function () {\n        var require = 'blah';\n    }());\n}");
   });
   it('should handle top level return statments', function(){
-    var exampleText = 'return require("require");';
-    derequire(exampleText).should.equal("return __derequire__('require');");
+    var exampleText = 'return (function(require){return require();}(function(){return "sentinel";}));';
+    derequire(exampleText).should.equal("return function (__derequire__) {\n    return __derequire__();\n}(function () {\n    return 'sentinel';\n});");
   });
 });
