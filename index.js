@@ -5,7 +5,7 @@ var escodegen = require('escodegen');
 function rename(code, tokenTo, tokenFrom){
     tokenTo = tokenTo || '__derequire__';
     tokenFrom = tokenFrom || 'require';
-    var ast = esprima.parse(code);
+    var ast = esprima.parse('!function(){'+code+'}');
     estraverse.traverse(ast,{
         leave:function(node, parent) {
             var isVariableName = node.type === 'Identifier'&&node.name===tokenFrom;
@@ -16,6 +16,6 @@ function rename(code, tokenTo, tokenFrom){
             }
         } 
     });
-    return escodegen.generate(ast);
+    return escodegen.generate(ast.body[0].expression.argument.body.body[0]);
 }
 module.exports = rename;
