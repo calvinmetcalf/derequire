@@ -1,0 +1,24 @@
+{
+  "name": "derequire",
+  "version": "0.0.0",
+  "description": "remove requires",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/calvinmetcalf/derequire.git"
+  },
+  "author": "Calvin Metcalf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/calvinmetcalf/derequire/issues"
+  },
+  "homepage": "https://github.com/calvinmetcalf/derequire",
+  "dependencies": {
+    "estraverse": "~1.5.0",
+    "esprima": "~1.0.4",
+    "escodegen": "~1.0.1"
+  }
+}
