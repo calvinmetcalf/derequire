@@ -2,15 +2,24 @@
 var estraverse = require('estraverse');
 var esprima = require('esprima');
 var esrefactor = require('esrefactor');
-function rename(code, tokenTo, tokenFrom){
+function testParse (code) {
+    try{
+         return esprima.parse(code,{range:true});
+    }catch(e){}
+}
+function rename(code, tokenTo, tokenFrom) {
     tokenTo = tokenTo || '_dereq_';
     tokenFrom = tokenFrom || 'require';
     if(tokenTo.length !== tokenFrom.length){
         throw new Error('bad stuff will happen if you try to change tokens of different length');
     }
-    var inCode = '!function(){'+code+'}';
+    var inCode = '!function(){'+code+'\n;}';
+    var ast = testParse(inCode);
+    if(!ast){
+        return code;
+    }
     var ctx = new esrefactor.Context(inCode);;
-    var ast = esprima.parse(inCode,{range:true});
+   
     estraverse.traverse(ast,{
         enter:function(node, parent) {
             var test = 
@@ -23,7 +32,7 @@ function rename(code, tokenTo, tokenFrom){
             }
         } 
     });
-    return ctx._code.slice(12, -1);
+    return ctx._code.slice(12, -3);
 }
 
 
