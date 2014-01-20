@@ -1,34 +1,29 @@
 'use strict';
 var estraverse = require('estraverse');
 var esprima = require('esprima');
-var escodegen = require('escodegen');
 var esrefactor = require('esrefactor');
 function rename(code, tokenTo, tokenFrom){
-    tokenTo = tokenTo || '__derequire__';
+    tokenTo = tokenTo || '_dereq_';
     tokenFrom = tokenFrom || 'require';
-    var inCode = '!function(){'+code+'}';
-    var location, ctx, ast;
-    var foundOne = true;
-    while(foundOne){
-        foundOne = false;
-        ast = esprima.parse(inCode,{range:true});
-        estraverse.traverse(ast,{
-            enter:function(node, parent) {
-                var isVariableName = node.type === 'Identifier'&&node.name===tokenFrom;
-                var isArugment = parent && (parent.type === 'FunctionDeclaration' || parent.type === 'FunctionExpression');
-                if(isVariableName&&isArugment){
-                    location = node.range[0];
-                    foundOne = true;
-                    this.break();
-                }
-            } 
-        });
-        if(foundOne){
-            ctx = new esrefactor.Context(inCode);
-            inCode = ctx.rename(ctx.identify(location), tokenTo);
-        }
+    if(tokenTo.length !== tokenFrom.length){
+        throw new Error('bad stuff will happen if you try to change tokens of different length');
     }
-    return escodegen.generate(esprima.parse(inCode).body[0].expression.argument.body.body[0]);
+    var inCode = '!function(){'+code+'}';
+    var ctx = new esrefactor.Context(inCode);;
+    var ast = esprima.parse(inCode,{range:true});
+    estraverse.traverse(ast,{
+        enter:function(node, parent) {
+            var test = 
+            parent &&
+            (parent.type === 'FunctionDeclaration' || parent.type === 'FunctionExpression') &&
+            node.name === tokenFrom &&
+            node.type === 'Identifier';
+            if(test){
+                ctx._code = ctx.rename(ctx.identify(node.range[0]), tokenTo);
+            }
+        } 
+    });
+    return ctx._code.slice(12, -1);
 }
 
 
