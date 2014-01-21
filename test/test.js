@@ -41,14 +41,14 @@ describe('derequire', function(){
       done();
     });
   });
-  it('should not fail on attribute lookups', function(done){
+  it('should not fail on attribute lookups', function(){
     var txt = 'var x=function(require,module,exports){'
         + 'var W=require("stream").Writable;'
-        + '})'
+        + '}'
     ;
     var expected = 'var x=function(_dereq_,module,exports){'
         + 'var W=_dereq_("stream").Writable;'
-        + '})'
+        + '}'
     ;
     derequire(txt).should.equal(expected);
   });
