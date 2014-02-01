@@ -1,6 +1,6 @@
 'use strict';
 var estraverse = require('estraverse');
-var esprima = require('esprima');
+var esprima = require('esprima-six');
 var esrefactor = require('esrefactor');
 function testParse (code) {
     try{
