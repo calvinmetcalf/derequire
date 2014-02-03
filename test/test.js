@@ -34,7 +34,7 @@ describe('derequire', function(){
   it('should work on something big', function(done){
     fs.readFile('./test/pouchdb.js', {encoding:'utf8'}, function(err, data){
       if(err){
-        done(err);
+        return done(err);
       }
       var transformed = derequire(data);
       hash(transformed).should.equal(compare);
