@@ -23,9 +23,17 @@ describe('derequire', function(){
     var exampleText = 'var x=function(require,module,exports){var process=require("__browserify_process");var requireText = "require";}//lala';
     derequire(exampleText).should.equal('var x=function(_dereq_,module,exports){var process=_dereq_("__browserify_process");var requireText = "require";}//lala');
   });
+  it('should work with whitespace inside require statement', function(){
+    var exampleText = 'var x=function(require,module,exports){var process=require(  "__browserify_process"   )}';
+    derequire(exampleText).should.equal('var x=function(_dereq_,module,exports){var process=_dereq_(  "__browserify_process"   )}');
+  });
+  it('should work with single quoted requires', function(){
+    var exampleText = 'var x=function(require,module,exports){var process=require(\'__browserify_process\')}';
+    derequire(exampleText).should.equal('var x=function(_dereq_,module,exports){var process=_dereq_(\'__browserify_process\')}');
+  });
   it('should throw an error if you try to change things of different sizes', function(){
     should.throw(function(){
-      derequire('lalalalla', 'la');
+      derequire('require("x")', 'lalalalla', 'la');
     });
   });
   it("should return the code back if it can't parse it", function(){
