@@ -7,6 +7,8 @@ function hash(data){
 }
 var compare = hash(fs.readFileSync('./test/pouchdb.dereq.js', {encoding: 'utf8'}));
 var compareCjsSmartass = fs.readFileSync('./test/cjs-smartass.dereq.js', {encoding: 'utf8'});
+var compareEmber = hash(fs.readFileSync('./test/ember.dereq.js', {encoding: 'utf8'}));
+var compareWrappedEmber = hash(fs.readFileSync('./test/ember.wrapped.dereq.js', {encoding: 'utf8'}));
 describe('derequire', function(){
   it('should work', function(){
     var exampleText = "var x=function(require,module,exports){var process=require(\"__browserify_process\");var requireText = \"require\";}";
@@ -71,5 +73,31 @@ describe('derequire', function(){
       done();
     });
 
+  })
+  it('should fix ember', function (done){
+    fs.readFile('./test/ember.js', {encoding:'utf8'}, function(err, data){
+      if(err){
+        return done(err);
+      }
+      var transformed = derequire(data);
+      // writing out for inspection
+      fs.writeFileSync(__dirname + '/ember.generated.js', transformed, 'utf8');
+      
+      hash(transformed).should.equal(compareEmber);
+      done();
+    });
+  })
+  it('should fix ember when I wrap', function (done){
+    fs.readFile('./test/ember.js', {encoding:'utf8'}, function(err, data){
+      if(err){
+        return done(err);
+      }
+      var transformed = derequire('(function(require){\n' + data + '\n})()');
+      // writing out for inspection
+      fs.writeFileSync(__dirname + '/ember.wrapped.generated.js', transformed, 'utf8');
+
+      hash(transformed).should.equal(compareWrappedEmber);
+      done();
+    });
   })
 });
