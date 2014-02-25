@@ -36,8 +36,11 @@ describe('derequire', function(){
       derequire('require("x")', 'lalalalla', 'la');
     });
   });
-  it("should return the code back if it can't parse it", function(){
+  it("should return notthe code back if it can't parse it", function(){
     derequire("/*").should.equal("/*");
+  });
+  it("should return the code back if it can't parse it and it has a require", function(){
+    derequire("/*require('").should.equal("/*require('");
   });
   it('should work on something big', function(done){
     fs.readFile('./test/pouchdb.js', {encoding:'utf8'}, function(err, data){
