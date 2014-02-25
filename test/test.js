@@ -7,6 +7,7 @@ function hash(data){
 }
 var compare = hash(fs.readFileSync('./test/pouchdb.dereq.js', {encoding: 'utf8'}));
 var compareCjsSmartass = fs.readFileSync('./test/cjs-smartass.dereq.js', {encoding: 'utf8'});
+var compareCjslazy = fs.readFileSync('./test/cjs-lazy.js', {encoding: 'utf8'});
 describe('derequire', function(){
   it('should work', function(){
     var exampleText = "var x=function(require,module,exports){var process=require(\"__browserify_process\");var requireText = \"require\";}";
@@ -74,5 +75,9 @@ describe('derequire', function(){
       done();
     });
 
-  })
+  });
+  it('should fix not fix cjs-lazy', function (){
+    derequire(compareCjslazy).should.equal(compareCjslazy);
+  });
+
 });
