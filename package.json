@@ -4,7 +4,7 @@
   "description": "remove requires",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/istanbul/lib/cli.js test ./node_modules/mocha/bin/_mocha test/test.js"
+    "test": "istanbul test ./node_modules/mocha/bin/_mocha test/test.js"
   },
   "repository": {
     "type": "git",
