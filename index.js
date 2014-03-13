@@ -1,6 +1,6 @@
 'use strict';
 var estraverse = require('estraverse');
-var esprima = require('esprima-six');
+var esprima = require('esprima');
 var esrefactor = require('esrefactor');
 
 var requireRegexp = /require.*\(.*['"]/m;
