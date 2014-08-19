@@ -13,10 +13,6 @@ describe('derequire', function(){
     var exampleText = "var x=function(require,module,exports){var process=require(\"__browserify_process\");var requireText = \"require\";}";
     derequire(exampleText).should.equal("var x=function(_dereq_,module,exports){var process=_dereq_(\"__browserify_process\");var requireText = \"require\";}");
   });
-  it('should only replace arguments and calls',function(){
-    var exampleText = "function x(require,module,exports){var process=require(\"__browserify_process\");var requireText = {}; requireText.require = \"require\";(function(){var require = 'blah';}())}";
-    derequire(exampleText).should.equal("function x(_dereq_,module,exports){var process=_dereq_(\"__browserify_process\");var requireText = {}; requireText.require = \"require\";(function(){var require = 'blah';}())}");
-  });
   it('should handle top level return statments', function(){
     var exampleText = 'return (function(require){return require();}(function(){return "sentinel";}));';
     derequire(exampleText).should.equal('return (function(_dereq_){return _dereq_();}(function(){return "sentinel";}));');
@@ -78,6 +74,11 @@ describe('derequire', function(){
   });
   it('should fix not fix cjs-lazy', function (){
     derequire(compareCjslazy).should.equal(compareCjslazy);
+  });
+  it('should modify ember data', function () {
+    var ed = fs.readFileSync('./test/ember-data.js', {encoding: 'utf8'});
+    var hash1 = hash(ed);
+    hash1.should.not.equal(hash(derequire(ed)));
   });
 
 });
