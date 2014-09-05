@@ -1,4 +1,4 @@
-derequire
+derequire [![Build Status](https://travis-ci.org/calvinmetcalf/derequire.svg)](https://travis-ci.org/calvinmetcalf/derequire)
 ====
 
 ```bash
