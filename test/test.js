@@ -80,5 +80,17 @@ describe('derequire', function(){
     var hash1 = hash(ed);
     hash1.should.not.equal(hash(derequire(ed)));
   });
-
+  it('should work on multiple things', function () {
+    var file = fs.readFileSync('./test/define.js', {encoding: 'utf8'});
+    derequire(file, [
+    {
+      from: 'require',
+      to: '_derec_'
+    },
+    {
+      from: 'define',
+      to: '_defi_'
+    }
+    ]).should.equal(fs.readFileSync('./test/define.dereq.js', {encoding: 'utf8'}));
+  });
 });

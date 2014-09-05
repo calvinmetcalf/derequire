@@ -22,12 +22,25 @@ function testParse (code) {
 function rename(code, tokenTo, tokenFrom) {
   tokenTo = tokenTo || '_dereq_';
   tokenFrom = tokenFrom || 'require';
-  
-  if(tokenTo.length !== tokenFrom.length){
+  var tokens;
+  if (!Array.isArray(tokenTo)) {
+    tokens = [{
+      to: tokenTo,
+      from: tokenFrom
+    }];
+  } else {
+    tokens = tokenTo;
+  }
+  if(tokens.some(function (item) {
+    return item.to.length !== item.from.length;
+  })){
       throw new Error('bad stuff will happen if you try to change tokens of different length');
   }
   
-  if (!requireRegexp(tokenFrom).test(code)) {
+  if (!tokens.some(function (item) {
+    var results = requireRegexp(item.from).test(code);
+    return results;
+  })) {
     return code;
   }
   
@@ -37,18 +50,20 @@ function rename(code, tokenTo, tokenFrom) {
   if(!ast){
     return code;
   }
-  
+  var tokenNames = tokens.map(function (item) {
+    return item.from;
+  });
   var ctx = new esrefactor.Context(inCode);
 
   estraverse.traverse(ast,{
     enter:function(node, parent) {
+      var index;
       var test = parent &&
         (parent.type === 'FunctionDeclaration' || parent.type === 'FunctionExpression' ||
           parent.type === 'VariableDeclarator') &&
-        node.name === tokenFrom && node.type === 'Identifier';
-        
+        node.type === 'Identifier' && (index = tokenNames.indexOf(node.name)) !== -1;
       if (test) {
-        ctx._code = ctx.rename(ctx.identify(node.range[0]), tokenTo);
+        ctx._code = ctx.rename(ctx.identify(node.range[0]), tokens[index].to);
       }
     }
   });
