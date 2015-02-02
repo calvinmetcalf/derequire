@@ -1,9 +1,9 @@
 !function (define) {
 
-  define(function (require) {
+  define(function (requir_) {
     var jQuery;
-    if (!jQuery && typeof require === 'function') {
-      jQuery = require('jquery');
+    if (!jQuery && typeof requir_ === 'function') {
+      jQuery = requir_('jquery');
     }
   });
 }();

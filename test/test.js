@@ -84,7 +84,7 @@ describe('derequire', function(){
     var file = fs.readFileSync('./test/define.js', {encoding: 'utf8'});
     derequire(file, [
     {
-      from: 'require',
+      from: 'requir_',
       to: '_derec_'
     },
     {
