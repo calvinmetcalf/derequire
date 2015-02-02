@@ -53,7 +53,8 @@ function rename(code, tokenTo, tokenFrom) {
   var tokenNames = tokens.map(function (item) {
     return item.from;
   });
-  var ctx = new esrefactor.Context(inCode);
+  var ctx = new esrefactor.Context(ast);
+  ctx._code = inCode;
 
   estraverse.traverse(ast,{
     enter:function(node, parent) {
