@@ -3,6 +3,7 @@
 var derequire = require('../');
 var concat = require('concat-stream');
 var fs = require('fs');
+
 var argv = require('yargs')
   .options('t', {
       alias : 'to',
@@ -19,14 +20,15 @@ var argv = require('yargs')
    .version(require('../package.json').version, 'v')
    .alias('v', 'version')
    .argv;
+
 var file = argv._[0];
 var input;
 if (file && file !== '-') {
   input = fs.createReadStream(file);
 } else {
   input = process.stdin;
-} 
+}
 
 input.pipe(concat(function(buf) {
-    console.log(derequire(buf.toString('utf8'), argv.t, argv.f));
+  console.log(derequire(buf, argv.t, argv.f));
 }));

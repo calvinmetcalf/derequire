@@ -1,6 +1,6 @@
-(function (require) {
+(function (_dereq_) {
   var jQuery;
-  if (!jQuery && typeof require === 'function') {
+  if (!jQuery && typeof _dereq_ === 'function') {
     jQuery = something('jquery');
   }
 })()

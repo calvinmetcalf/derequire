@@ -26,10 +26,9 @@
   },
   "homepage": "https://github.com/calvinmetcalf/derequire",
   "dependencies": {
+    "acorn": "^0.12.0",
     "concat-stream": "^1.4.6",
-    "esprima-fb": "^10001.1.0-dev-harmony-fb",
-    "esrefactor": "~0.1.0",
-    "estraverse": "~1.9.1",
+    "escope": "^2.0.6",
     "yargs": "^3.4.5"
   },
   "devDependencies": {

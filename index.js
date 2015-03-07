@@ -1,75 +1,91 @@
 'use strict';
 
-var estraverse = require('estraverse');
-var esprima = require('esprima-fb');
-var esrefactor = require('esrefactor');
-var _requireRegexp = /require.*\(.*['"]/m;
+var acorn = require('acorn');
+var escope = require('escope');
 
-function requireRegexp(token) {
-  if (token === 'require') {
-    return _requireRegexp;
+var requireRegexp = /\brequire\b/;
+
+function write(arr, str, offset) {
+  for (var i = 0, l = str.length; i < l; i++) {
+    arr[offset + i] = str[i];
   }
-  
-  return new RegExp(token + '.*\\(.*[\'"]', 'm');
-}
-
-function testParse (code) {
-  try {
-    return esprima.parse(code, { range: true });
-  } catch (e) {}
 }
 
 function rename(code, tokenTo, tokenFrom) {
-  tokenTo = tokenTo || '_dereq_';
-  tokenFrom = tokenFrom || 'require';
+
   var tokens;
   if (!Array.isArray(tokenTo)) {
     tokens = [{
-      to: tokenTo,
-      from: tokenFrom
+      from: tokenFrom || 'require',
+      to: tokenTo || '_dereq_'
     }];
   } else {
     tokens = tokenTo;
   }
-  if(tokens.some(function (item) {
-    return item.to.length !== item.from.length;
-  })){
-      throw new Error('bad stuff will happen if you try to change tokens of different length');
-  }
-  
-  if (!tokens.some(function (item) {
-    var results = requireRegexp(item.from).test(code);
-    return results;
-  })) {
-    return code;
-  }
-  
-  var inCode = '!function(){'+code+'\n;}';
-  var ast = testParse(inCode);
-  
-  if(!ast){
-    return code;
-  }
-  var tokenNames = tokens.map(function (item) {
-    return item.from;
-  });
-  var ctx = new esrefactor.Context(ast);
-  ctx._code = inCode;
 
-  estraverse.traverse(ast,{
-    enter:function(node, parent) {
-      var index;
-      var test = parent &&
-        (parent.type === 'FunctionDeclaration' || parent.type === 'FunctionExpression' ||
-          parent.type === 'VariableDeclarator') &&
-        node.type === 'Identifier' && (index = tokenNames.indexOf(node.name)) !== -1;
-      if (test) {
-        ctx._code = ctx.rename(ctx.identify(node.range[0]), tokens[index].to);
-      }
+  tokens.forEach(function(token) {
+    if (token.to.length !== token.from.length) {
+      throw new Error('"' + token.to + '" and "' + token.from + '" must be the same length');
     }
   });
-  
-  return ctx._code.slice(12, -3);
+
+  if (tokens.length === 1 &&
+      tokens[0].from === 'require' &&
+      !requireRegexp.test(code)) {
+    return code;
+  }
+
+  var ast;
+  try {
+    ast = acorn.parse(code, {
+      ecmaVersion: 6,
+      ranges: true,
+      allowReturnOutsideFunction: true
+    });
+  } catch(err) {
+    // this should probably log something and/or exit violently
+    return code;
+  }
+
+  //
+  // heavily inspired by https://github.com/estools/esshorten
+  //
+
+  code = String(code).split('');
+
+  var manager = escope.analyze(ast, {optimistic: true, ecmaVersion: 6});
+
+  for (var i = 0, iz = manager.scopes.length; i < iz; i++) {
+    var scope = manager.scopes[i];
+
+    for (var j = 0, jz = scope.variables.length; j < jz; j++) {
+      var variable = scope.variables[j];
+
+      if (variable.tainted || variable.identifiers.length === 0) {
+        continue;
+      }
+
+      for (var k = 0, kz = tokens.length; k < kz; k++) {
+        var token = tokens[k];
+
+        if (variable.name !== token.from) {
+          continue;
+        }
+
+        for (var l = 0, lz = variable.identifiers.length; l < lz; l++) {
+          var def = variable.identifiers[l];
+          write(code, token.to, def.range[0]);
+        }
+
+        for (var m = 0, mz = variable.references.length; m < mz; m++) {
+          var ref = variable.references[m];
+          write(code, token.to, ref.identifier.range[0]);
+        }
+      }
+    }
+  }
+
+  return code.join('');
 }
 
 module.exports = rename;
