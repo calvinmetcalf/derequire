@@ -7,7 +7,8 @@
     "derequire": "bin/cmd.js"
   },
   "scripts": {
-    "test": "istanbul test _mocha test/test.js"
+    "test": "istanbul test _mocha test/test.js",
+    "perf": "node test/perf.js"
   },
   "files": [
     "bin/cmd.js",
