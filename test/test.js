@@ -123,6 +123,15 @@ describe('derequire', function(){
     });
   });
 
+  it('should work on something complicated', function(done) {
+    fs.readFile('./test/react-with-addons.js', 'utf8', function(err, source) {
+      fs.readFile('./test/react-with-addons.dereq.js', 'utf8', function(err, expected) {
+        hash(derequire(source)).should.equal(hash(expected));
+        done();
+      });
+    });
+  });
+
   it('should fix cjs-smartassery', function(done) {
     fs.readFile('./test/cjs-smartass.js', 'utf8', function(err, source) {
       fs.readFile('./test/cjs-smartass.dereq.js', 'utf8', function(err, expected) {
