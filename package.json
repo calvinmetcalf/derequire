@@ -9,6 +9,11 @@
   "scripts": {
     "test": "istanbul test _mocha test/test.js"
   },
+  "files": [
+    "bin/cmd.js",
+    "index.js",
+    "readme.md"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/calvinmetcalf/derequire.git"
