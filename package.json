@@ -13,6 +13,7 @@
   "files": [
     "bin/cmd.js",
     "index.js",
+    "plugin.js",
     "readme.md"
   ],
   "repository": {
@@ -29,6 +30,7 @@
     "acorn": "^0.12.0",
     "concat-stream": "^1.4.6",
     "escope": "^2.0.6",
+    "through2": "^0.6.3",
     "yargs": "^3.4.5"
   },
   "devDependencies": {
