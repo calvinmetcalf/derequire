@@ -141,8 +141,10 @@ describe('derequire', function(){
 
   it('should modify ember data', function(done) {
     fs.readFile('./test/ember-data.js', 'utf8', function(err, source) {
-      hash(derequire(source)).should.not.equal(hash(source));
-      done();
+      fs.readFile('./test/ember-data.dereq.js', 'utf8', function(err, expected) {
+        hash(derequire(source)).should.equal(hash(expected));
+        done();
+      });
     });
   });
 
