@@ -1,96 +1,167 @@
 var should = require('chai').should();
-var derequire = require('../');
-var fs = require("fs");
+var fs = require('fs');
 var crypto = require('crypto');
+
 function hash(data){
   return crypto.createHash('sha512').update(data).digest('base64');
 }
-var compare = hash(fs.readFileSync('./test/pouchdb.dereq.js', {encoding: 'utf8'}));
-var compareCjsSmartass = fs.readFileSync('./test/cjs-smartass.dereq.js', {encoding: 'utf8'});
-var compareCjslazy = fs.readFileSync('./test/cjs-lazy.js', {encoding: 'utf8'});
+
 describe('derequire', function(){
+
+  var derequire = require('../');
+
   it('should work', function(){
-    var exampleText = "var x=function(require,module,exports){var process=require(\"__browserify_process\");var requireText = \"require\";}";
-    derequire(exampleText).should.equal("var x=function(_dereq_,module,exports){var process=_dereq_(\"__browserify_process\");var requireText = \"require\";}");
+    var source = (
+      'var x=function(require,module,exports){' +
+        'var process=require("__browserify_process");' +
+        'var requireText = "require";' +
+      '}'
+    );
+    var expected = (
+      'var x=function(_dereq_,module,exports){' +
+        'var process=_dereq_("__browserify_process");' +
+        'var requireText = "require";' +
+      '}'
+    );
+    derequire(source).should.equal(expected);
   });
-  it('should handle top level return statments', function(){
-    var exampleText = 'return (function(require){return require();}(function(){return "sentinel";}));';
-    derequire(exampleText).should.equal('return (function(_dereq_){return _dereq_();}(function(){return "sentinel";}));');
+
+  it('should handle top level return statments', function() {
+    var source = (
+      'return (' +
+        'function(require){return require();}' +
+        '(function(){return "sentinel";})' +
+      ');'
+    );
+    var expected = (
+      'return (' +
+        'function(_dereq_){return _dereq_();}' +
+        '(function(){return "sentinel";})' +
+      ');'
+    );
+    derequire(source).should.equal(expected);
   });
-  it('should work with a comment on the end', function(){
-    var exampleText = 'var x=function(require,module,exports){var process=require("__browserify_process");var requireText = "require";}//lala';
-    derequire(exampleText).should.equal('var x=function(_dereq_,module,exports){var process=_dereq_("__browserify_process");var requireText = "require";}//lala');
+
+  it('should work with a comment on the end', function() {
+    var source = (
+      'var x=function(require,module,exports){' +
+        'var process=require("__browserify_process");' +
+        'var requireText = "require";' +
+      '}//lala'
+    );
+    var expected = (
+      'var x=function(_dereq_,module,exports){' +
+        'var process=_dereq_("__browserify_process");' +
+        'var requireText = "require";' +
+      '}//lala'
+    );
+    derequire(source).should.equal(expected);
   });
-  it('should work with whitespace inside require statement', function(){
-    var exampleText = 'var x=function(require,module,exports){var process=require(  "__browserify_process"   )}';
-    derequire(exampleText).should.equal('var x=function(_dereq_,module,exports){var process=_dereq_(  "__browserify_process"   )}');
+
+  it('should work with whitespace inside require statement', function() {
+    var source = (
+      'var x=function(require,module,exports){' +
+        'var process=require(  "__browserify_process"   )' +
+      '}'
+    );
+    var expected = (
+      'var x=function(_dereq_,module,exports){' +
+        'var process=_dereq_(  "__browserify_process"   )' +
+      '}'
+    );
+    derequire(source).should.equal(expected);
   });
-  it('should work with single quoted requires', function(){
-    var exampleText = 'var x=function(require,module,exports){var process=require(\'__browserify_process\')}';
-    derequire(exampleText).should.equal('var x=function(_dereq_,module,exports){var process=_dereq_(\'__browserify_process\')}');
+
+  it('should work with single quoted requires', function() {
+    var source = (
+      'var x=function(require,module,exports){' +
+        'var process=require(\'__browserify_process\')' +
+      '}'
+    );
+    var expected = (
+      'var x=function(_dereq_,module,exports){' +
+        'var process=_dereq_(\'__browserify_process\')' +
+      '}'
+    );
+    derequire(source).should.equal(expected);
   });
-  it('should throw an error if you try to change things of different sizes', function(){
+
+  it('should throw an error if you try to change things of different sizes', function() {
     should.throw(function(){
       derequire('require("x")', 'lalalalla', 'la');
     });
   });
-  it("should return notthe code back if it can't parse it", function(){
-    derequire("/*").should.equal("/*");
-  });
-  it("should return the code back if it can't parse it and it has a require", function(){
-    derequire("/*require('").should.equal("/*require('");
-  });
-  it('should work on something big', function(done){
-    fs.readFile('./test/pouchdb.js', {encoding:'utf8'}, function(err, data){
-      if(err){
-        return done(err);
-      }
-      var transformed = derequire(data);
-      hash(transformed).should.equal(compare);
-      done();
-    });
-  });
-  it('should not fail on attribute lookups', function(){
-    var txt = 'var x=function(require,module,exports){'
-        + 'var W=require("stream").Writable;'
-        + '}'
-    ;
-    var expected = 'var x=function(_dereq_,module,exports){'
-        + 'var W=_dereq_("stream").Writable;'
-        + '}'
-    ;
-    derequire(txt).should.equal(expected);
-  });
-  it('should fix cjs-smartassery', function (done){
-    fs.readFile('./test/cjs-smartass.js', {encoding:'utf8'}, function(err, data){
-      if(err){
-        return done(err);
-      }
-      var transformed = derequire(data);
-      transformed.should.equal(compareCjsSmartass);
-      done();
-    });
 
+  it('should return not the code back if it cannot parse it', function() {
+    derequire('/*').should.equal('/*');
   });
-  it('should fix not fix cjs-lazy', function (){
-    derequire(compareCjslazy).should.equal(compareCjslazy);
+
+  it('should return the code back if it cannot parse it and it has a require', function() {
+    derequire('/*require(').should.equal('/*require(');
   });
-  it('should modify ember data', function () {
-    var ed = fs.readFileSync('./test/ember-data.js', {encoding: 'utf8'});
-    var hash1 = hash(ed);
-    hash1.should.not.equal(hash(derequire(ed)));
+
+  it('should not fail on attribute lookups', function() {
+    var source = (
+      'var x=function(require,module,exports){' +
+        'var W=require("stream").Writable;' +
+      '}'
+    );
+    var expected = (
+      'var x=function(_dereq_,module,exports){' +
+        'var W=_dereq_("stream").Writable;' +
+      '}'
+    );
+    derequire(source).should.equal(expected);
   });
-  it('should work on multiple things', function () {
-    var file = fs.readFileSync('./test/define.js', {encoding: 'utf8'});
-    derequire(file, [
-    {
-      from: 'requir_',
-      to: '_derec_'
-    },
-    {
-      from: 'define',
-      to: '_defi_'
-    }
-    ]).should.equal(fs.readFileSync('./test/define.dereq.js', {encoding: 'utf8'}));
+
+  it('should work on something big', function(done) {
+    fs.readFile('./test/pouchdb.js', 'utf8', function(err, source) {
+      fs.readFile('./test/pouchdb.dereq.js', 'utf8', function(err, expected) {
+        hash(derequire(source)).should.equal(hash(expected));
+        done();
+      });
+    });
   });
+
+  it('should fix cjs-smartassery', function(done) {
+    fs.readFile('./test/cjs-smartass.js', 'utf8', function(err, source) {
+      fs.readFile('./test/cjs-smartass.dereq.js', 'utf8', function(err, expected) {
+        hash(derequire(source)).should.equal(hash(expected));
+        done();
+      });
+    });
+  });
+
+  it('should fix not fix cjs-lazy', function(done) {
+    fs.readFile('./test/cjs-lazy.js', 'utf8', function(err, source) {
+      derequire(source).should.equal(source);
+      done();
+    });
+  });
+
+  it('should modify ember data', function(done) {
+    fs.readFile('./test/ember-data.js', 'utf8', function(err, source) {
+      hash(derequire(source)).should.not.equal(hash(source));
+      done();
+    });
+  });
+
+  it('should work on multiple things', function(done) {
+    fs.readFile('./test/define.js', 'utf8', function(err, source) {
+      fs.readFile('./test/define.dereq.js', 'utf8', function(err, expected) {
+        derequire(source, [
+          {
+            from: 'requir_',
+            to: '_derec_'
+          },
+          {
+            from: 'define',
+            to: '_defi_'
+          }
+        ]).should.equal(expected);
+        done();
+      });
+    });
+  });
+
 });
