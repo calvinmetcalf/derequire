@@ -30,5 +30,5 @@ if (file && file !== '-') {
 }
 
 input.pipe(concat(function(buf) {
-  console.log(derequire(buf, argv.t, argv.f));
+  process.stdout.write(derequire(buf, argv.t, argv.f));
 }));
