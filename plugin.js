@@ -5,7 +5,7 @@ var derequire = require('./');
 module.exports = function apply(b, opts) {
   var buffers = [];
 
-  if (opts && !Object.keys(opts).length) {
+  if (!Array.isArray(opts)) {
     opts = undefined;
   }
 

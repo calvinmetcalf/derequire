@@ -1,6 +1,8 @@
 var assert = require('assert');
 var fs = require('fs');
 var crypto = require('crypto');
+var vm = require('vm');
+var browserify = require('browserify');
 
 function hash(data){
   return crypto.createHash('sha512').update(data).digest('base64');
@@ -175,5 +177,54 @@ describe('derequire', function(){
       });
     });
   });
+});
 
+describe('browserify plugin', function() {
+  it('should work with default options', function(done) {
+    var b = browserify({
+      entries: [__dirname + '/browserify-main.js'],
+      plugin: ['./plugin']
+    })
+    b.bundle(function(err, src) {
+      assert.ok(!err);
+      assert.ok(String(src).indexOf('_dereq_') !== -1);
+      var called = false;
+      var c = {callme: function() { called = true; }};
+      vm.runInNewContext(src, c);
+      assert.ok(called);
+      done();
+    });
+  });
+
+  it('should work with no options', function(done) {
+    var b = browserify({
+      entries: [__dirname + '/browserify-main.js'],
+      plugin: [['./plugin']]
+    })
+    b.bundle(function(err, src) {
+      assert.ok(!err);
+      assert.ok(String(src).indexOf('_dereq_') !== -1);
+      var called = false;
+      var c = {callme: function() { called = true; }};
+      vm.runInNewContext(src, c);
+      assert.ok(called);
+      done();
+    });
+  });
+
+  it('should work with options', function(done) {
+    var b = browserify({
+      entries: [__dirname + '/browserify-main.js'],
+      plugin: [['./plugin', [{from: 'require', to: '_DEREQ_'}]]]
+    })
+    b.bundle(function(err, src) {
+      assert.ok(!err);
+      assert.ok(String(src).indexOf('_DEREQ_') !== -1);
+      var called = false;
+      var c = {callme: function() { called = true; }};
+      vm.runInNewContext(src, c);
+      assert.ok(called);
+      done();
+    });
+  });
 });
