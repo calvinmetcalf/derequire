@@ -35,12 +35,12 @@ __Note:__ In order to avoid quite a few headaches the token you're changing from
 
 ### Command-line API
 
+There's a CLI that accepts a file path as an argument (absolute or relative to CWD) or reads from `stdin` if file path is `-` or omitted, and accepts `-f|--from` and `-t|--to` options that correspond to the API `tokenFrom` and `tokenTo` options. Examples:
+
 ```bash
+derequire input.js > output.js
 derequire < input.js > output.js
-```
-
-Or:
-
-```bash
-derequire --from require --to _dereq_
+browserify input.js | derequire > output.js
+browserify input.js | derequire - > output.js
+derequire input.js --from require --to _gonzo_ > output.js
 ```
