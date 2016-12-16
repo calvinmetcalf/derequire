@@ -1,6 +1,6 @@
 {
   "name": "derequire",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "remove requires",
   "main": "index.js",
   "bin": {
