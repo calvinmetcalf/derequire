@@ -5,6 +5,10 @@ derequire [![Build Status](https://travis-ci.org/calvinmetcalf/derequire.svg)](h
 npm install derequire
 ```
 
+`derequire` can be used either as a JavaScript API or as a CLI.
+
+### JavaScript API
+
 ```javascript
 var derequire = require('derequire');
 var transformedCode = derequire(code, /*tokenTo=*/'_dereq_', /*tokenFrom=*/'require');
@@ -28,3 +32,15 @@ derequire(code, [
 ```
 
 __Note:__ In order to avoid quite a few headaches the token you're changing from and the token you're changing to need to be the same length.
+
+### Command-line API
+
+There's a CLI that accepts a file path as an argument (absolute or relative to CWD) or reads from `stdin` if file path is `-` or omitted, and accepts `-f|--from` and `-t|--to` options that correspond to the API `tokenFrom` and `tokenTo` options. Examples:
+
+```bash
+derequire input.js > output.js
+derequire < input.js > output.js
+browserify input.js | derequire > output.js
+browserify input.js | derequire - > output.js
+derequire input.js --from require --to _gonzo_ > output.js
+```
