@@ -38,7 +38,7 @@ function rename(code, tokenTo, tokenFrom) {
   var ast;
   try {
     ast = acorn.parse(code, {
-      ecmaVersion: 6,
+      ecmaVersion: 8,
       ranges: true,
       allowReturnOutsideFunction: true
     });
@@ -53,7 +53,7 @@ function rename(code, tokenTo, tokenFrom) {
 
   code = String(code).split('');
 
-  var manager = escope.analyze(ast, {optimistic: true, ecmaVersion: 6});
+  var manager = escope.analyze(ast, {optimistic: true, ecmaVersion: 8});
 
   for (var i = 0, iz = manager.scopes.length; i < iz; i++) {
     var scope = manager.scopes[i];

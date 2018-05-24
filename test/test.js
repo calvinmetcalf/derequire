@@ -166,6 +166,16 @@ describe('derequire', function(){
       });
     });
   });
+
+  it('should work with es8', function(done) {
+    fs.readFile('./test/es8.js', 'utf8', function(err, source) {
+      fs.readFile('./test/es8.dereq.js', 'utf8', function(err, expected) {
+        assert.equal( derequire(source), expected);
+        done();
+      });
+    });
+  });
+
   it('should work on multiple things', function(done) {
     fs.readFile('./test/define.js', 'utf8', function(err, source) {
       fs.readFile('./test/define.dereq.js', 'utf8', function(err, expected) {
