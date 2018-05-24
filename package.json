@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/calvinmetcalf/derequire",
   "dependencies": {
-    "acorn": "^4.0.3",
+    "acorn": "^4.0.13",
     "concat-stream": "^1.4.6",
     "escope": "^3.6.0",
     "through2": "^2.0.0",
