@@ -38,7 +38,7 @@ function rename(code, tokenTo, tokenFrom) {
   var ast;
   try {
     ast = acorn.parse(code, {
-      ecmaVersion: 8,
+      ecmaVersion: 11,
       ranges: true,
       allowReturnOutsideFunction: true
     });
