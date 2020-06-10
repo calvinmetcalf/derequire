@@ -43,7 +43,7 @@ function rename(code, tokenTo, tokenFrom) {
       allowReturnOutsideFunction: true
     });
   } catch(err) {
-    // this should probably log something and/or exit violently
+    console.error("Cannot parse ast, cowardly aborting", err);
     return code;
   }
 
