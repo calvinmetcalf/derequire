@@ -1,6 +1,6 @@
 function outer(require=()=>{}) {
   require('foo');
-  const opts = {require: require};
+  const opts = {require};
   opts.require('lala');
 }
 function other(opts) {
